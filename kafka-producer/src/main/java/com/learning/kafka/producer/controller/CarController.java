@@ -22,12 +22,6 @@ public class CarController {
 	
 	@PostMapping()
 	public ResponseEntity<CarDTO> create(@RequestBody CarDTO carDTO){
-		CarDTO car = CarDTO.builder()
-				.id(UUID.randomUUID().toString())
-				.color(carDTO.getColor())
-				.model(carDTO.getModel()).build();
-		carProducer.send(car);
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body(car);
+		return carProducer.send(carDTO);
 	}
 }

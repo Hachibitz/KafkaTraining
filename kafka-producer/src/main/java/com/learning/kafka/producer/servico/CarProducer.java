@@ -1,8 +1,12 @@
 package com.learning.kafka.producer.servico;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +24,17 @@ public class CarProducer {
 		this.kafkaTemplate = kafkaTemplate;
 	}
 	
-	public void send(CarDTO carDTO) {
-		kafkaTemplate.send(topic, carDTO).addCallback(
+	public ResponseEntity<CarDTO> send(CarDTO carDTO) {
+		CarDTO car = CarDTO.builder()
+				.id(UUID.randomUUID().toString())
+				.color(carDTO.getColor())
+				.model(carDTO.getModel()).build();
+		
+		kafkaTemplate.send(topic, car).addCallback(
 				success -> logger.info("Message send" + success.getProducerRecord().value()),
 				failure -> logger.info("Message failure" + failure.getMessage())
 		);
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(car);
 	}
 }
